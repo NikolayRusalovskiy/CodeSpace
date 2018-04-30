@@ -31,6 +31,7 @@ public class Task4 {
         Scanner sc = new Scanner(System.in);
         System.out.print("Write line -->");
         String line = sc.nextLine();
+        validateLineForSyntax(line);
         System.out.println("Line has correct number of breaks --> " + countBrackets(line));
     }
 
@@ -39,20 +40,26 @@ public class Task4 {
 
         int result = 0;
         for (int i = 0; i < str.length(); i++) {
-
-
             if (str.charAt(i) == '(') {
                 result += 1;
             }
-            if (str.charAt(i) == '(') {
+
+            if (str.charAt(i) == ')') {
                 result -= 1;
             }
+
         }
 
         if (result == 0) {
             return true;
         } else return false;
     }
-
+public static String validateLineForSyntax(String line){
+        if (line.indexOf(')')<line.indexOf('(') |line.lastIndexOf('(')<line.lastIndexOf('('))
+        {
+            System.out.println("Incorrect String value");
+        }
+        return line;
+}
 
 }
