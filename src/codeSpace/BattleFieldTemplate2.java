@@ -5,8 +5,8 @@ import java.awt.*;
 
 public class BattleFieldTemplate2 extends JPanel {
     final boolean COLORDED_MODE = true;
-    final int BF_WIDTH = 576;
     final int BF_HEIGHT = 576;
+    final int BF_WIDTH = 576;
     final int TOP = 1;
     final int BOTTOM = 2;
     final int LEFT = 3;
@@ -40,15 +40,46 @@ public class BattleFieldTemplate2 extends JPanel {
 //        moveToQuadrant(3, 7);
 //        moveToQuadrant(2, 6);
         while (fire()) ;
-
-
+        System.out.println("The End");
     }
 
     boolean fire() throws Exception {
 // посмотреть этот метод move
         bulletX = tankX + 25;
         bulletY = tankY + 25;
-        processInterception();
+        turn(tankDirection);
+        int bulletStarterX = bulletX;
+        int bulletStarterY = bulletY;
+        while (bulletX < (BF_WIDTH - 32) | (bulletY < BF_HEIGHT - 32)) {
+            if (processInterception()) {
+                bulletX = bulletStarterX;
+                bulletY = bulletStarterY;
+            }
+
+            for (int i = 0; i < CELL_SIZE; i += STEP) {
+                switch (tankDirection) {
+                    case 1:
+                        bulletY -= STEP;
+                        break;
+                    case 2:
+                        bulletY += STEP;
+                        break;
+                    case 3:
+                        bulletX -= STEP;
+                        break;
+                    case 4:
+                        bulletX += STEP;
+                        break;
+                }
+                repaint();
+                Thread.sleep(BULLET_SPEED);
+            }
+            if (bulletX > (BF_WIDTH - 32) | (bulletY > BF_HEIGHT - 32)) {
+                return false;
+            }
+
+        }
+
 
         return false;
     }
@@ -63,6 +94,7 @@ public class BattleFieldTemplate2 extends JPanel {
                 return true;
             }
         }
+
         return false;
     }
 
