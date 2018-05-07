@@ -24,27 +24,105 @@ public class BattleFieldTemplate2 extends JPanel {
      * Write your code here.
      */
     String[][] battleField = {
-            {" ", " ", "B", " ", "B", " ", "B", " ", "B", "B"},
-            {" ", "B", "B", "B", " ", " ", "B", " ", "B", "B"},
-            {" ", "B", "B", "B", " ", " ", "B", " ", "B", "B"},
-            {" ", " ", "B", " ", " ", " ", "B", " ", "B", "B"},
-            {" ", " ", "B", " ", "B", " ", "B", " ", "B", "B"},
-            {" ", " ", "B", " ", "B", " ", "B", " ", "B", "B"},
-            {" ", " ", "B", " ", "B", " ", "B", " ", "B", "B"},
-            {" ", " ", "B", " ", "B", " ", "B", " ", "B", "B"},
-            {" ", " ", "B", " ", "B", " ", "B", " ", "B", "B"}
+            {" ", " ", "B", " ", "B", " ", "B", " ", "B"},
+            {" ", "B", "B", "B", " ", "B", "B", "B", "B"},
+            {" ", "B", "B", "B", " ", " ", " ", " ", " "},
+            {" ", " ", "B", " ", " ", " ", "B", " ", "B"},
+            {" ", " ", "B", " ", "B", " ", "B", " ", "B"},
+            {" ", " ", "B", " ", "B", " ", "B", " ", "B"},
+            {" ", " ", "B", " ", "B", " ", "B", " ", "B"},
+            {" ", " ", "B", " ", "B", " ", "B", " ", "B"},
+            {" ", " ", "B", " ", "B", " ", "B", " ", "B"}
     };
 
     void runTheGame() throws Exception {
 //        Task22
 //        moveToQuadrant(3, 7);
 //        moveToQuadrant(2, 6);
-        while (fire()) ;
-        System.out.println("The End");
+
+//        Task2_2.3
+//        while (fire()) ;
+
+        setTankQuadrant(7, 2);
+        moveToQuadrant2(2, 6);
+        System.out.println("the End");
+    }
+
+    void setTankQuadrant(int v, int h) {
+        tankX = v * CELL_SIZE;
+        tankY = h * CELL_SIZE;
+    }
+    void moveToQuadrant2(int v, int h) throws Exception {
+        String cordinate = getQuadrantXY(v, h);
+        int coreX = Integer.parseInt(cordinate.substring(0, cordinate.indexOf('_')));
+        int coreY = Integer.parseInt(cordinate.substring(cordinate.indexOf('_') + 1));
+        while (tankX != coreX) {
+            if ((coreX - tankX) > 0) {
+                tankDirection = RIGHT;
+                move2();
+            } else if ((coreX - tankX) < 0) {
+                tankDirection = LEFT;
+                move2();
+            }
+        }
+        while (tankY != coreY) {
+            if ((coreY - tankY) > 0) {
+                tankDirection = BOTTOM;
+                move2( );
+            } else if ((coreY - tankY) < 0) {
+                tankDirection = TOP;
+                move2( );
+            }
+        }
+    }
+    void clearNextField() throws Exception {
+        int tankXfuture = 0;
+        int tankYfuture = 0;
+        switch (tankDirection) {
+            case 1:
+                tankYfuture = tankY - CELL_SIZE;
+                break;
+            case 2:
+                tankYfuture = tankY + CELL_SIZE;
+                break;
+            case 3:
+                tankXfuture = tankX - CELL_SIZE;
+                break;
+            case 4:
+                tankXfuture = tankX + CELL_SIZE;
+                break;
+        }
+       if ( processInterception(tankXfuture, tankYfuture)){
+            fire();
+       };
+    }
+
+    void move2() throws Exception {
+
+        turn(tankDirection);
+        clearNextField();
+        for (int i = 0; i < CELL_SIZE; i += STEP) {
+            switch (tankDirection) {
+                case 1:
+                    tankY -= STEP;
+                    break;
+                case 2:
+                    tankY += STEP;
+                    break;
+                case 3:
+                    tankX -= STEP;
+                    break;
+                case 4:
+                    tankX += STEP;
+                    break;
+            }
+            repaint();
+            Thread.sleep(SPEED);
+        }
     }
 
     boolean fire() throws Exception {
-// посмотреть этот метод move
+
         bulletX = tankX + 25;
         bulletY = tankY + 25;
         turn(tankDirection);
@@ -74,7 +152,7 @@ public class BattleFieldTemplate2 extends JPanel {
                 repaint();
                 Thread.sleep(BULLET_SPEED);
             }
-            if (bulletX > (BF_WIDTH - 32) | (bulletY > BF_HEIGHT - 32)) {
+            if (bulletX > (BF_WIDTH - 32) | (bulletY > BF_HEIGHT - 32) | bulletX<0|bulletY<0) {
                 return false;
             }
 
@@ -86,6 +164,20 @@ public class BattleFieldTemplate2 extends JPanel {
 
     boolean processInterception() {
         String quadrantNumbers = getQuadrant(bulletX, bulletY);
+        int quadrantVertical = Integer.parseInt(quadrantNumbers.substring(0, quadrantNumbers.indexOf('_')));
+        int quadrantHorizontal = Integer.parseInt(quadrantNumbers.substring(quadrantNumbers.indexOf('_') + 1));
+        if (verifyExistenceOfCell(quadrantVertical, quadrantHorizontal)) {
+            if (battleField[quadrantVertical][quadrantHorizontal].equals("B")) {
+                battleField[quadrantVertical][quadrantHorizontal] = " ";
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    boolean processInterception(int x, int y) {
+        String quadrantNumbers = getQuadrant(x, y);
         int quadrantVertical = Integer.parseInt(quadrantNumbers.substring(0, quadrantNumbers.indexOf('_')));
         int quadrantHorizontal = Integer.parseInt(quadrantNumbers.substring(quadrantNumbers.indexOf('_') + 1));
         if (verifyExistenceOfCell(quadrantVertical, quadrantHorizontal)) {
@@ -153,7 +245,7 @@ public class BattleFieldTemplate2 extends JPanel {
         }
     }
 
-    void move(int direction) throws Exception {
+    void move(int direction) throws InterruptedException {
         turn(direction);
         for (int i = 0; i < CELL_SIZE; i += STEP) {
             switch (tankDirection) {
