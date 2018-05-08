@@ -16,15 +16,15 @@ public class BattleFieldTemplate2 extends JPanel {
     int tankY = 0;
     int bulletX = -100;
     int bulletY = -100;
-    final int SPEED = 50;
-    final int BULLET_SPEED = 5;
+    final int SPEED = 20;
+    final int BULLET_SPEED = 3;
     final int STEP = 1;
     final int CELL_SIZE = 64;
     /**
      * Write your code here.
      */
     String[][] battleField = {
-            {" ", " ", "B", " ", "B", " ", "B", " ", "B"},
+            {" ", " ", "B", " ", " ", " ", " ", " ", "B"},
             {" ", "B", "B", "B", " ", "B", "B", "B", "B"},
             {" ", "B", "B", "B", " ", " ", " ", " ", " "},
             {" ", " ", "B", " ", " ", " ", "B", " ", "B"},
@@ -42,9 +42,14 @@ public class BattleFieldTemplate2 extends JPanel {
 
 //        Task2_2.3
 //        while (fire()) ;
-
-        setTankQuadrant(7, 2);
+//        tankDirection = LEFT;
+        setTankQuadrant(3, 4);
+//        while (fire()) ;
         moveToQuadrant2(2, 6);
+        moveToQuadrant2(1, 1);
+        moveToQuadrant2(1, 9);
+        moveToQuadrant2(9, 9);
+        moveToQuadrant2(9, 1);
         System.out.println("the End");
     }
 
@@ -52,6 +57,7 @@ public class BattleFieldTemplate2 extends JPanel {
         tankX = v * CELL_SIZE;
         tankY = h * CELL_SIZE;
     }
+
     void moveToQuadrant2(int v, int h) throws Exception {
         String cordinate = getQuadrantXY(v, h);
         int coreX = Integer.parseInt(cordinate.substring(0, cordinate.indexOf('_')));
@@ -68,51 +74,52 @@ public class BattleFieldTemplate2 extends JPanel {
         while (tankY != coreY) {
             if ((coreY - tankY) > 0) {
                 tankDirection = BOTTOM;
-                move2( );
+                move2();
             } else if ((coreY - tankY) < 0) {
                 tankDirection = TOP;
-                move2( );
+                move2();
             }
         }
     }
+
     void clearNextField() throws Exception {
-        int tankXfuture = 0;
-        int tankYfuture = 0;
+        int tankXfuture = tankX;
+        int tankYfuture = tankY;
         switch (tankDirection) {
-            case 1:
+            case TOP:
                 tankYfuture = tankY - CELL_SIZE;
                 break;
-            case 2:
+            case BOTTOM:
                 tankYfuture = tankY + CELL_SIZE;
                 break;
-            case 3:
+            case LEFT:
                 tankXfuture = tankX - CELL_SIZE;
                 break;
-            case 4:
+            case RIGHT:
                 tankXfuture = tankX + CELL_SIZE;
                 break;
         }
-       if ( processInterception(tankXfuture, tankYfuture)){
+        if (processInterception(tankXfuture, tankYfuture)) {
+            System.out.println("Make fire");
             fire();
-       };
+        }
+
     }
 
     void move2() throws Exception {
-
-        turn(tankDirection);
         clearNextField();
         for (int i = 0; i < CELL_SIZE; i += STEP) {
             switch (tankDirection) {
-                case 1:
+                case TOP:
                     tankY -= STEP;
                     break;
-                case 2:
+                case BOTTOM:
                     tankY += STEP;
                     break;
-                case 3:
+                case LEFT:
                     tankX -= STEP;
                     break;
-                case 4:
+                case RIGHT:
                     tankX += STEP;
                     break;
             }
@@ -121,45 +128,47 @@ public class BattleFieldTemplate2 extends JPanel {
         }
     }
 
-    boolean fire() throws Exception {
+    boolean verifyShoot() {
+        if (bulletX < (BF_WIDTH - 32) && (bulletY < BF_HEIGHT - 32) && bulletX > 0 && bulletY > 0) {
+            return true;
+        }
+        return false;
+    }
 
+    boolean fire() throws Exception {
         bulletX = tankX + 25;
         bulletY = tankY + 25;
-        turn(tankDirection);
+        boolean doFire = false;
         int bulletStarterX = bulletX;
         int bulletStarterY = bulletY;
-        while (bulletX < (BF_WIDTH - 32) | (bulletY < BF_HEIGHT - 32)) {
+        while (verifyShoot()) {
             if (processInterception()) {
-                bulletX = bulletStarterX;
-                bulletY = bulletStarterY;
+                bulletX = -100;
+                bulletY = -100;
+                doFire = true;
             }
 
             for (int i = 0; i < CELL_SIZE; i += STEP) {
                 switch (tankDirection) {
-                    case 1:
+                    case TOP:
                         bulletY -= STEP;
                         break;
-                    case 2:
+                    case BOTTOM:
                         bulletY += STEP;
                         break;
-                    case 3:
+                    case LEFT:
                         bulletX -= STEP;
                         break;
-                    case 4:
+                    case RIGHT:
                         bulletX += STEP;
                         break;
                 }
                 repaint();
                 Thread.sleep(BULLET_SPEED);
             }
-            if (bulletX > (BF_WIDTH - 32) | (bulletY > BF_HEIGHT - 32) | bulletX<0|bulletY<0) {
-                return false;
-            }
 
         }
-
-
-        return false;
+        return doFire;
     }
 
     boolean processInterception() {
@@ -182,11 +191,10 @@ public class BattleFieldTemplate2 extends JPanel {
         int quadrantHorizontal = Integer.parseInt(quadrantNumbers.substring(quadrantNumbers.indexOf('_') + 1));
         if (verifyExistenceOfCell(quadrantVertical, quadrantHorizontal)) {
             if (battleField[quadrantVertical][quadrantHorizontal].equals("B")) {
-                battleField[quadrantVertical][quadrantHorizontal] = " ";
+//                battleField[quadrantVertical][quadrantHorizontal] = " ";
                 return true;
             }
         }
-
         return false;
     }
 
@@ -249,16 +257,16 @@ public class BattleFieldTemplate2 extends JPanel {
         turn(direction);
         for (int i = 0; i < CELL_SIZE; i += STEP) {
             switch (tankDirection) {
-                case 1:
+                case TOP:
                     tankY -= STEP;
                     break;
-                case 2:
+                case BOTTOM:
                     tankY += STEP;
                     break;
-                case 3:
+                case LEFT:
                     tankX -= STEP;
                     break;
-                case 4:
+                case RIGHT:
                     tankX += STEP;
                     break;
             }
