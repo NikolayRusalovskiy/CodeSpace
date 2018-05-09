@@ -43,19 +43,76 @@ public class BattleFieldTemplate2 extends JPanel {
 //        Task2_2.3
 //        while (fire()) ;
 //        tankDirection = LEFT;
-        setTankQuadrant(3, 4);
-//        while (fire()) ;
-        moveToQuadrant2(2, 6);
-        moveToQuadrant2(1, 1);
-        moveToQuadrant2(1, 9);
-        moveToQuadrant2(9, 9);
-        moveToQuadrant2(9, 1);
+//        setTankQuadrant(3, 3);// LeftTop
+//        setTankQuadrant(6, 3);// RightTop
+//        setTankQuadrant(3, 6);// LeftBottom
+        setTankQuadrant(6, 6);// BottomRight
+
+        clean();
+
         System.out.println("the End");
     }
 
     void setTankQuadrant(int v, int h) {
         tankX = v * CELL_SIZE;
         tankY = h * CELL_SIZE;
+    }
+
+    void clean() throws Exception {
+        desantTankToquadrant();
+        moveToCloseCorner();
+        cleanAllBF();
+    }
+
+    void desantTankToquadrant() {
+        int vertical = tankY / CELL_SIZE;
+        int horizontal = tankX / CELL_SIZE;
+        if (battleField[vertical][horizontal].equals("B")) {
+            battleField[vertical][horizontal] = " ";
+            System.out.println("Tank desant to quadrant and destroy object");
+        }
+    }
+
+    void cleanAllBF() throws Exception {
+        if (tankX == 0 & tankY == 0) {
+            for (int i = 1; i <= BF_WIDTH / CELL_SIZE; i++) {
+                moveToQuadrant2(1, i);
+                turn(BOTTOM);
+                while (fire()) ;
+            }
+        } else if (tankX == (BF_HEIGHT - CELL_SIZE) & tankY == 0) {
+            for (int i = 1; i <= BF_WIDTH / CELL_SIZE; i++) {
+                moveToQuadrant2(i, 9);
+                turn(LEFT);
+                while (fire()) ;
+            }
+        } else if (tankX == 0 & tankY == (BF_WIDTH - CELL_SIZE)) {
+            for (int i = 1; i <= BF_WIDTH / CELL_SIZE; i++) {
+                moveToQuadrant2(9, i);
+                turn(TOP);
+                while (fire()) ;
+            }
+        } else if (tankX == (BF_HEIGHT - CELL_SIZE) & tankY == (BF_WIDTH - CELL_SIZE)) {
+            for (int i = BF_WIDTH / CELL_SIZE; i >= 1; i--) {
+                moveToQuadrant2(9, i);
+                turn(TOP);
+                while (fire()) ;
+            }
+        }
+
+
+    }
+
+    void moveToCloseCorner() throws Exception {
+        int cornerCloseY, cornerCloseX;
+        if ((BF_HEIGHT - tankY) < tankY) {
+            cornerCloseY = BF_HEIGHT / CELL_SIZE;
+        } else cornerCloseY = 1;
+
+        if ((BF_WIDTH - tankX) < tankX) {
+            cornerCloseX = BF_WIDTH / CELL_SIZE;
+        } else cornerCloseX = 1;
+        moveToQuadrant2(cornerCloseY, cornerCloseX);
     }
 
     void moveToQuadrant2(int v, int h) throws Exception {
@@ -142,13 +199,9 @@ public class BattleFieldTemplate2 extends JPanel {
         int bulletStarterX = bulletX;
         int bulletStarterY = bulletY;
         while (verifyShoot()) {
-            if (processInterception()) {
-                bulletX = -100;
-                bulletY = -100;
-                doFire = true;
-            }
 
             for (int i = 0; i < CELL_SIZE; i += STEP) {
+
                 switch (tankDirection) {
                     case TOP:
                         bulletY -= STEP;
@@ -166,7 +219,11 @@ public class BattleFieldTemplate2 extends JPanel {
                 repaint();
                 Thread.sleep(BULLET_SPEED);
             }
-
+            if (processInterception()) {
+                bulletX = -100;
+                bulletY = -100;
+                doFire = true;
+            }
         }
         return doFire;
     }
