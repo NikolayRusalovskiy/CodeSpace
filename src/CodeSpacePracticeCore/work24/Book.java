@@ -1,4 +1,4 @@
-package codeSpace.work24;
+package CodeSpacePracticeCore.work24;
 
 public class Book {
     public Book() {

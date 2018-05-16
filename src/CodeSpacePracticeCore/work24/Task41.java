@@ -1,9 +1,9 @@
-package codeSpace.work24;
+package CodeSpacePracticeCore.work24;
 
 public class Task41 {
     public static void main(String[] args) {
         Book book = new Book();
-        getInfoBook(book);
+        view(book);
         System.out.println("======================================================");
         book.setAuthor("Ivan Pertov");
         book.setCountPage(365);
@@ -14,7 +14,7 @@ public class Task41 {
         warAndPeace.getViewBook();
     }
 
-    public static void getInfoBook(Book book) {
+    public static void view(Book book) {
         System.out.println("ID = " + book.getId());
         System.out.println("Title = " + book.getTitle());
         System.out.println("Autor = " + book.getAuthor());
